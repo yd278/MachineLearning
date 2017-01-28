@@ -1,0 +1,7 @@
+.idea
+*/.idea
+*.class
+*.iml
+data
+large_dataset
+*.txt
