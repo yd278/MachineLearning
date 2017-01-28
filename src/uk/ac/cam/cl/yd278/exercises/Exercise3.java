@@ -15,9 +15,9 @@ import java.util.*;
  * Created by Anchor on 2017/1/27.
  */
 public class Exercise3 {
-    int total = 0;
+    private int total = 0;
     private Map<String, Double> count = new HashMap<>();
-
+    private Set<String> tenWords = new HashSet<>();
     public static void main(String args[]) throws IOException {
         Exercise3 e = new Exercise3();
         Path reviewsDir = Paths.get("large_dataset");
@@ -26,17 +26,14 @@ public class Exercise3 {
     }
     public void sort(List<Map.Entry<String, Double>> list){
 
-        Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {
-            public int compare(Map.Entry<String, Double> o1,
-                               Map.Entry<String, Double> o2) {
-                double diff = o2.getValue() - o1.getValue();
-                if(diff > 0) return 1;
-                if(diff < 0) return -1;
-                return 0;
-            }
+        list.sort((o1, o2) -> {
+            double diff = o2.getValue() - o1.getValue();
+            if (diff > 0) return 1;
+            if (diff < 0) return -1;
+            return 0;
         });
     }
-    public List<Map.Entry<String, Double>> calculateSortedFrequencies(Path reviewsDir) throws IOException {
+    private List<Map.Entry<String, Double>> calculateSortedFrequencies(Path reviewsDir) throws IOException {
         try (DirectoryStream<Path> files = Files.newDirectoryStream(reviewsDir)) {
             for (Path item : files) {
                 List<String> tokens = Tokenizer.tokenize(item);
@@ -56,48 +53,49 @@ public class Exercise3 {
         } catch (IOException e) {
             throw new IOException("Can't read the reviews.", e);
         }
+
+        System.out.println("calculating...");
         for (String s : count.keySet()) {
             Double f = count.get(s) / (double) total;
             count.put(s, f);
         }
 
         List<Map.Entry<String, Double>> list =
-                new ArrayList<Map.Entry<String, Double>>(count.entrySet());
+                new ArrayList<>(count.entrySet());
         sort(list);
         return list;
 
     }
-
-    public void plotFrequencyVsRank(Path reviewsDir) throws IOException {
+    private boolean inTenWords(String s){
+        return tenWords.contains(s);
+    }
+    private void plotFrequencyVsRank(Path reviewsDir) throws IOException {
+        System.out.println("reading data...");
         List<Map.Entry<String, Double>> frequencies = calculateSortedFrequencies(reviewsDir);
         List<BestFit.Point> points = new LinkedList<>();
+        List<BestFit.Point> tenPoints = new LinkedList<>();
+        tenWords.add("best");
+        tenWords.add("well");
+        tenWords.add("satisfying");
+        tenWords.add("awesome");
+        tenWords.add("mistaken");
+        tenWords.add("bland");
+        tenWords.add("lacking");
+        tenWords.add("unfortunately");
+        tenWords.add("relax");
+        tenWords.add("dramatic");
+        System.out.println("plotting...");
         for (int i = 0; i < 10000; i++) {
+            if(i%1000==0){
+
+                System.out.println(i/100 + "%");
+            }
             BestFit.Point p = new BestFit.Point((double) i + 1, frequencies.get(i).getValue());
+            if(inTenWords(frequencies.get(i).getKey()))tenPoints.add(p);
             points.add(p);
         }
         ChartPlotter.plotLines(points);
-        //BONUS: plot 10 words selected in task 1
-        Map<String,Double> tenWords = new HashMap<>();
-        tenWords.put("best",count.get("best"));
-        tenWords.put("well",count.get("well"));
-        tenWords.put("satisfying",count.get("satisfying"));
-        tenWords.put("awesome",count.get("awesome"));
-        tenWords.put("mistaken",count.get("mistaken"));
-        tenWords.put("bland",count.get("bland"));
-        tenWords.put("lacking",count.get("lacking"));
-        tenWords.put("unfortunately",count.get("unfortunately"));
-        tenWords.put("relax",count.get("relax"));
-        tenWords.put("dramatic",count.get("dramatic"));
-        List<Map.Entry<String, Double>> sortedTenWords =
-                new ArrayList<>(count.entrySet());
-        
-
-
-
-        //然而题意理解错了
-        //把10个词都放进map先 然后On扫一遍整个frequency
-        //并不想写
-        //回去再说
+        ChartPlotter.plotLines(tenPoints);
     }
 
 }
