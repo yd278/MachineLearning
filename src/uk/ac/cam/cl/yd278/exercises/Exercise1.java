@@ -30,45 +30,11 @@ public class Exercise1 implements IExercise1 {
         else return true;
     }
 
-    public Map<String, ImprovedSentiment> getLexicon(Path lexiconFile) throws IOException {
-        Map<String, ImprovedSentiment> lexicon = new HashMap<>();
-        try (BufferedReader reader = Files.newBufferedReader(lexiconFile)) {
-            reader.lines().forEach(new Consumer<String>() {
-                @Override
-                public void accept(String line) {
-                    // Ignore neutral polarity entries.
-                    Sentiment polarity;
-                    boolean strong;
-                    if (line.contains("priorpolarity=negative")) {
-                        polarity = Sentiment.NEGATIVE;
-                    } else if (line.contains("priorpolarity=positive")) {
-                        polarity = Sentiment.POSITIVE;
-                    } else {
-                        return;
-                    }
-                    if (line.contains("type=strongsubj")) {
-                        strong = true;
-                    } else if (line.contains("type=weaksubj")) {
-                        strong = false;
-                    } else {
-                        return;
-                    }
-                    Pattern p = Pattern.compile("word1=([-\\w]+) "); //some words have hyphens
-                    Matcher m = p.matcher(line);
-                    m.find();
-                    String word = m.group(1); // If match not found, bad lexicon
-                    lexicon.put(word, new ImprovedSentiment(strong, polarity));
-                }
-            });
-        } catch (IOException e) {
-            throw new IOException("Lexicon file can't be accessed.", e);
-        }
-        return lexicon;
-    }
+
 
     @Override
     public Map<Path, Sentiment> simpleClassifier(Set<Path> testSet, Path lexiconFile) throws IOException {
-        Map<String, ImprovedSentiment> lexicon = getLexicon(lexiconFile);
+        Map<String, ImprovedSentiment> lexicon = Classifier.getLexicon(lexiconFile);
         Map<Path, Sentiment> result = new HashMap<>();
         int positiveCount;
         for (Path p : testSet) {
@@ -101,7 +67,7 @@ public class Exercise1 implements IExercise1 {
 
     @Override
     public Map<Path, Sentiment> improvedClassifier(Set<Path> testSet, Path lexiconFile) throws IOException {
-        Map<String, ImprovedSentiment> lexicon = getLexicon(lexiconFile);
+        Map<String, ImprovedSentiment> lexicon = Classifier.getLexicon(lexiconFile);
         Map<Path, Sentiment> result = new HashMap<>();
         double positivity;
         for (Path p : testSet) {
@@ -109,8 +75,8 @@ public class Exercise1 implements IExercise1 {
             List<String> words = Tokenizer.tokenize(p);
             for (String word : words) {
                 ImprovedSentiment s = lexicon.get(word);
-                if ((s == null) && (s.getSentiment() == null)) continue;
-                positivity += calculatePositivity(s,0.25);
+                if ((s == null) || (s.getSentiment() == null)) continue;
+                positivity += calculatePositivity(s,2.0);
             }
             if (positivity >= 0.0) result.put(p, Sentiment.POSITIVE);
             else result.put(p, Sentiment.NEGATIVE);
@@ -122,7 +88,7 @@ public class Exercise1 implements IExercise1 {
     private double calculatePositivity(ImprovedSentiment s, double rate) {
         double mark = 1.0;
         if (s.getSentiment() == Sentiment.NEGATIVE) mark *= -1;
-        if (!s.strong()) mark *= rate;
+        if (s.strong()) mark *= rate;
         return mark;
     }
 
