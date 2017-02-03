@@ -75,7 +75,8 @@ public class Exercise4 implements IExercise4 {
             if (!a.equals(actual) && b.equals(actual)) minus++;
         }
         double result = 0;
-        int n = plus + minus + mNull+ (mNull & 1);
+
+        int n = plus + minus + mNull + (mNull & 1);
         int k = Math.min(plus, minus) + mNull / 2 + (mNull & 1);
         for (int i = 0; i <= k; i++) {
             double c = combinatorial(n, i).doubleValue();
@@ -83,6 +84,6 @@ public class Exercise4 implements IExercise4 {
             result += 2 * c;
 
         }
-        return result;
+        return 1 - result;
     }
 }
