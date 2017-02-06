@@ -17,6 +17,8 @@ import java.util.*;
 public class Exercise3 {
     private int total = 0;
     private Map<String, Double> count = new HashMap<>();
+    private Map<String, Double> frequency = new HashMap<>();
+
     private Set<String> tenWords = new HashSet<>();
     public static void main(String args[]) throws IOException {
         Exercise3 e = new Exercise3();
@@ -49,6 +51,8 @@ public class Exercise3 {
         try (DirectoryStream<Path> files = Files.newDirectoryStream(reviewsDir)) {
             int cnt = 0;
             for (Path item : files) {
+                cnt++;
+                if(cnt%1000 == 0) System.out.println(cnt);
                 List<String> tokens = Tokenizer.tokenize(item);
                 for (String s : tokens) {
                     cnt++;
@@ -77,11 +81,11 @@ public class Exercise3 {
         System.out.println("calculating...");
         for (String s : count.keySet()) {
             Double f = count.get(s) / (double) total;
-            count.put(s, f);
+            frequency.put(s, f);
         }
 
         List<Map.Entry<String, Double>> list =
-                new ArrayList<>(count.entrySet());
+                new ArrayList<>(frequency.entrySet());
         sort(list);
         return list;
 
@@ -116,9 +120,10 @@ public class Exercise3 {
         ChartPlotter.plotLines(points);//frequency vs rank
         ChartPlotter.plotLines(tenPoints);//ten words selected in task 1
         List<BestFit.Point> logLogPoints = new ArrayList<>();
+
         for(int i = 0; i < 10000; i++){
             BestFit.Point p = points.get(i);
-            logLogPoints.add(new BestFit.Point(Math.log(p.x), Math.log(p.y)));
+            logLogPoints.add(new BestFit.Point(Math.log(p.x), Math.log(p.y * total)));
         }
         //===================fitting
 

@@ -125,7 +125,6 @@ public class Exercise2 implements IExercise2 {
                 }
 
             }
-            //if(max==Double.NEGATIVE_INFINITY)cNB = Sentiment.NEGATIVE;
             result.put(path, cNB);
         }
         return result;
