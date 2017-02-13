@@ -3,7 +3,5 @@
 data
 large_dataset
 *.txt
-*.png
-class_predictions.csv
 out/
 screenshoots/

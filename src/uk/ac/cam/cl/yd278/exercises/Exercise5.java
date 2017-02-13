@@ -6,8 +6,6 @@ import uk.ac.cam.cl.mlrwd.exercises.sentiment_detection.Sentiment;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.util.*;
 
 /**
@@ -40,6 +38,10 @@ public class Exercise5 implements IExercise5 {
     }
     */
 
+    public static void main(String args[]) {
+
+    }
+
     @Override
     public List<Map<Path, Sentiment>> splitCVRandom(Map<Path, Sentiment> dataSet, int seed) {
         List<Map<Path, Sentiment>> result = new LinkedList<>();
@@ -62,7 +64,7 @@ public class Exercise5 implements IExercise5 {
     public List<Map<Path, Sentiment>> splitCVStratifiedRandom(Map<Path, Sentiment> dataSet, int seed) {
         List<Map<Path, Sentiment>> result = new LinkedList<>();
         List<Map.Entry<Path, Sentiment>> entries = new ArrayList<>(dataSet.entrySet());
-        Collections.shuffle(entries,new Random(seed));
+        Collections.shuffle(entries, new Random(seed));
         List<Map.Entry<Path, Sentiment>> positiveList = new ArrayList<>();
         List<Map.Entry<Path, Sentiment>> negativeList = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
@@ -75,22 +77,23 @@ public class Exercise5 implements IExercise5 {
             Map<Path, Sentiment> fold = new HashMap<>();
             for (int count = 0; count < each; count++) {
                 int posi = each * foldIdx + count;
-                fold.put(positiveList.get(posi).getKey(),Sentiment.POSITIVE);
-                fold.put(negativeList.get(posi).getKey(),Sentiment.NEGATIVE);
+                fold.put(positiveList.get(posi).getKey(), Sentiment.POSITIVE);
+                fold.put(negativeList.get(posi).getKey(), Sentiment.NEGATIVE);
             }
             result.add(fold);
         }
         return result;
     }
-/*
-    public Map<Path,Sentiment> lexiconResult(Map<Path,Sentiment> trainingSet) throws IOException {
-        Map<Path,Sentiment> result = new HashMap<>();
-        Exercise1 implement = new Exercise1();
 
-        Path lexiconFile = Paths.get("data/sentiment_lexicon");
-        result = implement.simpleClassifier(trainingSet.keySet(),lexiconFile);
-        return result;
-    }*/
+    /*
+        public Map<Path,Sentiment> lexiconResult(Map<Path,Sentiment> trainingSet) throws IOException {
+            Map<Path,Sentiment> result = new HashMap<>();
+            Exercise1 implement = new Exercise1();
+
+            Path lexiconFile = Paths.get("data/sentiment_lexicon");
+            result = implement.simpleClassifier(trainingSet.keySet(),lexiconFile);
+            return result;
+        }*/
     @Override
     public double[] crossValidate(List<Map<Path, Sentiment>> folds) throws IOException {
         double results[] = new double[10];
@@ -110,7 +113,7 @@ public class Exercise5 implements IExercise5 {
 
             //testing
             Map<Path, Sentiment> predictedResult = implement.naiveBayes(testSet.keySet(), smoothedLogProbs, classProbabilities);
-            //Map<Path, Sentiment> predictedResult = lexiconResult(testSet);
+
             int total = testSet.size();
             int correct = 0;
             for (Path p : testSet.keySet()) {
@@ -139,8 +142,5 @@ public class Exercise5 implements IExercise5 {
             sum += (score - mean) * (score - mean);
         }
         return sum / n;
-    }
-    public static void main(String args[]){
-
     }
 }

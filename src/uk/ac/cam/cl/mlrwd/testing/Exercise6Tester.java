@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 //TODO: Replace with your package.
-import uk.ac.cam.cl.emm68.exercises.Exercise6;
+import uk.ac.cam.cl.yd278.exercises.Exercise6;
 import uk.ac.cam.cl.mlrwd.exercises.sentiment_detection.DataPreparation6;
 import uk.ac.cam.cl.mlrwd.exercises.sentiment_detection.IExercise6;
 import uk.ac.cam.cl.mlrwd.exercises.sentiment_detection.NuancedSentiment;
